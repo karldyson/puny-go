@@ -4,13 +4,17 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"runtime/debug"
 	"strings"
 
 	"golang.org/x/net/idna"
 )
 
 var (
-	terseOutput = flag.Bool("terse", false, "Terse output")
+	terseOutput          = flag.Bool("terse", false, "Terse output")
+	version              = flag.Bool("version", false, "the code version")
+	revision             = flag.Bool("revision", false, "revision and build information")
+	versionString string = "devel"
 )
 
 func main() {
@@ -21,6 +25,22 @@ func main() {
 	}
 
 	flag.Parse()
+
+	// output revision info
+	if *revision {
+		bi, ok := debug.ReadBuildInfo()
+		if !ok {
+			panic("not ok reading build info!")
+		}
+		fmt.Printf("%s version information:\ncommit %s\n%+v\n", os.Args[0], versionString, bi)
+		return
+	}
+
+	// output version info
+	if *version {
+		fmt.Printf("%s version %s\n", os.Args[0], versionString)
+		return
+	}
 
 	switch len(flag.Args()) {
 	case 1:
